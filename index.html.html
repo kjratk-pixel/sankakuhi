@@ -1,0 +1,1321 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>三角比の表 暗記ドリル (0°〜180°)</title>
+  <!-- Latin Modern Math Font -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/latin-modern-math@1.0.0/style.css">
+  <!-- Canvas Confetti -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+  <style>
+    @font-face {
+      font-family: "Latin Modern Math Custom";
+      src: url("https://cdn.jsdelivr.net/npm/latin-modern-math@1.0.0/latinmodern-math.woff2") format("woff2"),
+           url("https://cdn.jsdelivr.net/npm/latin-modern-math@1.0.0/latinmodern-math.woff") format("woff");
+      font-weight: normal;
+      font-style: normal;
+    }
+
+    :root {
+      --bg: #0f172a;
+      --card-bg: #1e293b;
+      --card-border: #334155;
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+      --primary: #38bdf8;
+      --primary-hover: #0284c7;
+      --primary-light: rgba(56, 189, 248, 0.15);
+      --accent: #f59e0b;
+      --success: #10b981;
+      --error: #ef4444;
+      --table-header: #1e293b;
+      --table-cell: #0f172a;
+      --cell-border: #334155;
+      --palette-btn: #334155;
+      --palette-btn-hover: #475569;
+      --modal-bg: #1e293b;
+
+      /* 文字サイズ初期値（中） */
+      --cell-font-size: 1.15rem;
+      --cell-frac-size: 1.05rem;
+    }
+
+    [data-theme="light"] {
+      --bg: #f8fafc;
+      --card-bg: #ffffff;
+      --card-border: #cbd5e1;
+      --text: #0f172a;
+      --text-muted: #64748b;
+      --primary: #0284c7;
+      --primary-hover: #0369a1;
+      --primary-light: rgba(2, 132, 199, 0.1);
+      --accent: #d97706;
+      --success: #059669;
+      --error: #dc2626;
+      --table-header: #f1f5f9;
+      --table-cell: #ffffff;
+      --cell-border: #cbd5e1;
+      --palette-btn: #f1f5f9;
+      --palette-btn-hover: #e2e8f0;
+      --modal-bg: #ffffff;
+    }
+
+    /* 文字サイズ変更ルール（表枠固定） */
+    [data-font-size="small"] {
+      --cell-font-size: 0.95rem;
+      --cell-frac-size: 0.85rem;
+    }
+    [data-font-size="medium"] {
+      --cell-font-size: 1.15rem;
+      --cell-frac-size: 1.05rem;
+    }
+    [data-font-size="large"] {
+      --cell-font-size: 1.35rem;
+      --cell-frac-size: 1.25rem;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 12px;
+      transition: background-color 0.25s, color 0.25s;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 920px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    header {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      padding: 4px 6px;
+    }
+
+    h1 {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .header-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .font-size-control {
+      display: inline-flex;
+      align-items: center;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      padding: 2px 4px;
+      gap: 2px;
+    }
+    .font-size-label {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      padding: 0 4px;
+    }
+    .size-btn {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      padding: 4px 8px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    .size-btn.active {
+      background: var(--primary);
+      color: #fff;
+    }
+
+    .btn-icon {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      color: var(--text);
+      padding: 6px 10px;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      transition: background 0.15s, border-color 0.15s;
+    }
+    .btn-icon:hover {
+      border-color: var(--primary);
+    }
+
+    .controls-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 10px 14px;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+    }
+
+    .mode-tabs {
+      display: flex;
+      background: var(--bg);
+      padding: 3px;
+      border-radius: 8px;
+      border: 1px solid var(--card-border);
+    }
+
+    .tab-btn {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      padding: 6px 12px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .tab-btn.active {
+      background: var(--card-bg);
+      color: var(--primary);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+
+    .stats {
+      display: flex;
+      gap: 14px;
+      align-items: center;
+      font-size: 0.9rem;
+      font-weight: 600;
+    }
+
+    .stat-badge {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      color: var(--text-muted);
+    }
+    .stat-val {
+      color: var(--text);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .table-wrapper {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      overflow-x: auto;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+      -webkit-overflow-scrolling: touch;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      table-layout: fixed;
+      text-align: center;
+      min-width: 640px;
+    }
+
+    th, td {
+      border: 1px solid var(--cell-border);
+      height: 56px;
+      max-height: 56px;
+      padding: 0;
+      position: relative;
+    }
+
+    th {
+      background: var(--table-header);
+      color: var(--text-muted);
+      font-weight: 600;
+      font-size: 0.85rem;
+      height: 38px;
+    }
+
+    th.corner-cell {
+      width: 65px;
+      font-weight: 700;
+      color: var(--text);
+      font-family: "Latin Modern Math Custom", "Latin Modern Math", serif;
+      font-style: italic;
+      font-size: 1.05rem;
+    }
+
+    th.angle-cell {
+      font-size: 0.85rem;
+      color: var(--text);
+    }
+
+    td.cell-label {
+      background: var(--table-header);
+      font-weight: 700;
+      font-size: 1rem;
+      color: var(--primary);
+      width: 65px;
+      font-family: "Latin Modern Math Custom", "Latin Modern Math", serif;
+      font-style: italic;
+    }
+
+    .quiz-cell {
+      background: var(--table-cell);
+      cursor: pointer;
+      font-weight: 600;
+      color: var(--text);
+      transition: background 0.15s, border-color 0.15s;
+    }
+
+    .quiz-cell:hover {
+      background: var(--primary-light);
+    }
+
+    .quiz-cell.selected {
+      outline: 3px solid var(--primary);
+      outline-offset: -3px;
+      background: var(--primary-light);
+      z-index: 2;
+    }
+
+    .quiz-cell.hidden {
+      color: transparent;
+      background: repeating-linear-gradient(
+        45deg,
+        var(--table-cell),
+        var(--table-cell) 8px,
+        var(--card-border) 8px,
+        var(--card-border) 16px
+      );
+    }
+    .quiz-cell.hidden.selected {
+      background: var(--primary-light);
+    }
+
+    .quiz-cell.hidden::after {
+      content: "?";
+      color: var(--text-muted);
+      font-size: 1.15rem;
+      opacity: 0.7;
+      font-family: "Latin Modern Math Custom", "Latin Modern Math", serif;
+    }
+    .quiz-cell.hidden.selected::after {
+      color: var(--primary);
+      font-weight: bold;
+    }
+
+    .quiz-cell.correct-anim {
+      animation: popSuccess 0.4s ease;
+      background: rgba(16, 185, 129, 0.2);
+    }
+
+    .quiz-cell.wrong-anim {
+      animation: shakeWrong 0.4s ease;
+      background: rgba(239, 68, 68, 0.25);
+    }
+
+    @keyframes popSuccess {
+      0% { transform: scale(0.96); }
+      50% { transform: scale(1.04); }
+      100% { transform: scale(1); }
+    }
+
+    @keyframes shakeWrong {
+      0%, 100% { transform: translateX(0); }
+      20%, 60% { transform: translateX(-5px); }
+      40%, 80% { transform: translateX(5px); }
+    }
+
+    /* Latin Modern Math 数式表示 */
+    .math-expr {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: var(--cell-font-size);
+      font-family: "Latin Modern Math Custom", "Latin Modern Math", "Cambria Math", serif;
+      line-height: 1;
+      height: 100%;
+      width: 100%;
+      letter-spacing: 0.02em;
+      white-space: nowrap;
+    }
+    .math-expr.non-italic {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      font-style: normal;
+      font-weight: 700;
+    }
+    .frac {
+      display: inline-flex;
+      flex-direction: column;
+      vertical-align: middle;
+      text-align: center;
+      padding: 0 3px;
+      font-size: var(--cell-frac-size);
+    }
+    .frac-num {
+      border-bottom: 1.5px solid currentColor;
+      padding-bottom: 2px;
+      display: block;
+    }
+    .frac-den {
+      padding-top: 2px;
+      display: block;
+    }
+    .sqrt {
+      white-space: nowrap;
+      display: inline-flex;
+      align-items: center;
+    }
+    .sqrt-sym {
+      font-style: normal;
+      font-size: 1.15em;
+      margin-right: -1px;
+      font-family: "Latin Modern Math Custom", "Latin Modern Math", serif;
+    }
+    .sqrt-rad {
+      border-top: 1.5px solid currentColor;
+      padding-top: 2px;
+    }
+
+    /* Palette */
+    .palette-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+    }
+
+    .palette-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    .active-target-info {
+      font-weight: 700;
+      color: var(--primary);
+      font-size: 1.05rem;
+      font-family: "Latin Modern Math Custom", "Latin Modern Math", serif;
+    }
+
+    .palette-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+    }
+
+    @media (min-width: 600px) {
+      .palette-grid {
+        grid-template-columns: repeat(7, 1fr);
+      }
+    }
+
+    .val-btn {
+      background: var(--palette-btn);
+      border: 1px solid var(--card-border);
+      color: var(--text);
+      height: 50px;
+      border-radius: 8px;
+      cursor: pointer;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 1.15rem;
+      font-weight: 600;
+      transition: all 0.15s;
+    }
+
+    .val-btn:active {
+      transform: scale(0.95);
+    }
+
+    .val-btn:hover {
+      background: var(--palette-btn-hover);
+      border-color: var(--primary);
+    }
+
+    /* Modal */
+    .modal-overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0, 0, 0, 0.7);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+      padding: 16px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s;
+      backdrop-filter: blur(4px);
+    }
+
+    .modal-overlay.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .modal-body {
+      background: var(--modal-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      width: 100%;
+      max-width: 780px;
+      max-height: 90vh;
+      overflow-y: auto;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      box-shadow: 0 20px 25px -5px rgba(0,0,0,0.3);
+    }
+
+    .modal-title {
+      font-size: 1.35rem;
+      font-weight: bold;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: var(--text);
+    }
+
+    .modal-close {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      font-size: 1.8rem;
+      cursor: pointer;
+      padding: 0 6px;
+      line-height: 1;
+    }
+
+    .hint-section {
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 18px;
+      background: var(--bg);
+    }
+
+    .hint-section-title {
+      font-weight: 700;
+      font-size: 1.15rem;
+      margin-bottom: 12px;
+      color: var(--primary);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .hint-desc {
+      font-size: 0.95rem;
+      color: var(--text-muted);
+      margin-bottom: 12px;
+      line-height: 1.6;
+    }
+
+    /* 授業スライド準拠の三角比ルール＆三平方レイアウト */
+    .rule-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+    }
+    @media (min-width: 600px) {
+      .rule-container {
+        flex-direction: row;
+        justify-content: space-around;
+      }
+    }
+
+    .rule-formula-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      font-size: 1.25rem;
+      font-family: "Latin Modern Math Custom", "Latin Modern Math", serif;
+      min-width: 180px;
+    }
+    .rule-formula-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      white-space: nowrap;
+    }
+    .rule-label {
+      font-style: italic;
+      min-width: 70px;
+    }
+    .rule-frac {
+      display: inline-flex;
+      flex-direction: column;
+      align-items: center;
+      font-size: 1.1rem;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      font-weight: bold;
+    }
+    .rule-frac-num {
+      border-bottom: 2px solid currentColor;
+      padding: 0 4px 2px 4px;
+    }
+    .rule-frac-den {
+      padding: 2px 4px 0 4px;
+    }
+
+    .pythagoras-box {
+      margin-top: 14px;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 10px;
+      padding: 12px 16px;
+      text-align: center;
+      font-size: 1.15rem;
+      font-weight: bold;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .pythagoras-expr {
+      font-size: 1.3rem;
+      letter-spacing: 0.05em;
+    }
+
+    /* 授業スライドカラー */
+    .c-naname { color: #22c55e; } /* 緑 */
+    .c-yoko { color: #ef4444; }   /* 赤 */
+    .c-tate { color: #eab308; }   /* 黄 */
+
+    .unit-circle-controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+
+    .angle-chip {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      color: var(--text);
+      font-size: 0.9rem;
+      font-weight: 600;
+      padding: 6px 12px;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    .angle-chip.active {
+      background: var(--primary);
+      color: #fff;
+      border-color: var(--primary);
+    }
+
+    .circle-display-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+    }
+    @media (min-width: 580px) {
+      .circle-display-wrap {
+        flex-direction: row;
+        justify-content: space-around;
+      }
+    }
+
+    .circle-info-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 10px;
+      padding: 14px 18px;
+      font-size: 1.15rem;
+      line-height: 2.2;
+      min-width: 230px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+
+    .triangle-diagram-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 16px;
+    }
+    @media (min-width: 580px) {
+      .triangle-diagram-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    .diagram-box {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 10px;
+      padding: 16px 12px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+    }
+
+    .diagram-box h4 {
+      font-size: 1.1rem;
+      margin-bottom: 12px;
+      color: var(--text);
+      font-family: "Latin Modern Math Custom", "Latin Modern Math", serif;
+      letter-spacing: 0.03em;
+    }
+
+    .trig-values-list {
+      margin-top: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      font-size: 1.15rem;
+      font-family: "Latin Modern Math Custom", "Latin Modern Math", serif;
+      width: 100%;
+      max-width: 230px;
+    }
+
+    .trig-val-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 2px 6px;
+      white-space: nowrap;
+    }
+
+    .trig-label {
+      font-style: italic;
+      white-space: nowrap;
+      margin-right: 12px;
+    }
+
+    .feedback-toast {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      padding: 12px 28px;
+      border-radius: 30px;
+      font-weight: bold;
+      font-size: 1.15rem;
+      box-shadow: 0 10px 15px -3px rgba(0,0,0,0.3);
+      transition: transform 0.25s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+      z-index: 100;
+      pointer-events: none;
+    }
+    .feedback-toast.show {
+      transform: translateX(-50%) translateY(0);
+    }
+    .feedback-toast.correct {
+      background: var(--success);
+      color: #ffffff;
+    }
+    .feedback-toast.wrong {
+      background: var(--error);
+      color: #ffffff;
+    }
+  </style>
+</head>
+<body data-theme="dark" data-font-size="medium">
+  <div class="container">
+    <header>
+      <h1>📐 三角比の表 暗記ドリル</h1>
+      <div class="header-actions">
+        <div class="font-size-control">
+          <span class="font-size-label">文字:</span>
+          <button class="size-btn" data-size="small">小</button>
+          <button class="size-btn active" data-size="medium">中</button>
+          <button class="size-btn" data-size="large">大</button>
+        </div>
+        <button id="themeToggleBtn" class="btn-icon">☀️ ライト</button>
+        <button id="hintBtn" class="btn-icon">💡 単位円・定義の図解</button>
+      </div>
+    </header>
+
+    <div class="controls-card">
+      <div class="mode-tabs">
+        <button class="tab-btn active" data-mode="random">🎲 ランダム穴埋め</button>
+        <button class="tab-btn" data-mode="full">⚡ 全埋めアタック</button>
+        <button class="tab-btn" data-mode="view">📖 表を見る</button>
+      </div>
+      <div class="stats" id="statsWrap">
+        <div class="stat-badge">⏱️ <span id="timeVal" class="stat-val">00:00</span></div>
+        <div class="stat-badge">進捗: <span id="progressVal" class="stat-val">0 / 27</span></div>
+        <div class="stat-badge">ミス: <span id="mistakeVal" class="stat-val">0</span></div>
+        <button id="resetBtn" class="btn-icon" style="padding: 4px 8px;">🔄 やり直す</button>
+      </div>
+    </div>
+
+    <!-- Table -->
+    <div class="table-wrapper">
+      <table id="trigTable">
+        <thead>
+          <tr>
+            <th class="corner-cell">θ</th>
+            <th class="angle-cell">0°</th>
+            <th class="angle-cell">30°</th>
+            <th class="angle-cell">45°</th>
+            <th class="angle-cell">60°</th>
+            <th class="angle-cell">90°</th>
+            <th class="angle-cell">120°</th>
+            <th class="angle-cell">135°</th>
+            <th class="angle-cell">150°</th>
+            <th class="angle-cell">180°</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr data-func="sin">
+            <td class="cell-label">sin θ</td>
+            <td class="quiz-cell" data-angle="0"></td>
+            <td class="quiz-cell" data-angle="30"></td>
+            <td class="quiz-cell" data-angle="45"></td>
+            <td class="quiz-cell" data-angle="60"></td>
+            <td class="quiz-cell" data-angle="90"></td>
+            <td class="quiz-cell" data-angle="120"></td>
+            <td class="quiz-cell" data-angle="135"></td>
+            <td class="quiz-cell" data-angle="150"></td>
+            <td class="quiz-cell" data-angle="180"></td>
+          </tr>
+          <tr data-func="cos">
+            <td class="cell-label">cos θ</td>
+            <td class="quiz-cell" data-angle="0"></td>
+            <td class="quiz-cell" data-angle="30"></td>
+            <td class="quiz-cell" data-angle="45"></td>
+            <td class="quiz-cell" data-angle="60"></td>
+            <td class="quiz-cell" data-angle="90"></td>
+            <td class="quiz-cell" data-angle="120"></td>
+            <td class="quiz-cell" data-angle="135"></td>
+            <td class="quiz-cell" data-angle="150"></td>
+            <td class="quiz-cell" data-angle="180"></td>
+          </tr>
+          <tr data-func="tan">
+            <td class="cell-label">tan θ</td>
+            <td class="quiz-cell" data-angle="0"></td>
+            <td class="quiz-cell" data-angle="30"></td>
+            <td class="quiz-cell" data-angle="45"></td>
+            <td class="quiz-cell" data-angle="60"></td>
+            <td class="quiz-cell" data-angle="90"></td>
+            <td class="quiz-cell" data-angle="120"></td>
+            <td class="quiz-cell" data-angle="135"></td>
+            <td class="quiz-cell" data-angle="150"></td>
+            <td class="quiz-cell" data-angle="180"></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Palette -->
+    <div class="palette-card" id="paletteCard">
+      <div class="palette-header">
+        <span>入力パレット: <span id="activeTargetText" class="active-target-info">マスを選択してください</span></span>
+        <span style="font-size:0.75rem;">※ 教科書準拠（非有理化）表記</span>
+      </div>
+      <div class="palette-grid" id="paletteGrid"></div>
+    </div>
+  </div>
+
+  <div class="feedback-toast" id="feedbackToast">正解！</div>
+
+  <!-- Hint & Diagram Modal -->
+  <div class="modal-overlay" id="hintModal">
+    <div class="modal-body">
+      <div class="modal-title">
+        <span>💡 三角比のルール・単位円・比率</span>
+        <button class="modal-close" id="modalCloseBtn">&times;</button>
+      </div>
+
+      <!-- Section 1: 授業スライド準拠の「三角比のルール」＆「三平方の定理」 -->
+      <div class="hint-section">
+        <div class="hint-section-title">⭐ 三角比のルール（直角三角形の定義）</div>
+        <div class="rule-container">
+          <svg width="240" height="150" viewBox="0 0 240 150">
+            <!-- 三角形: A(30, 125) -> C(190, 125) -> B(190, 20) -->
+            <polygon points="30,125 190,125 190,20" fill="none" stroke="var(--primary)" stroke-width="2.5" stroke-linejoin="round"/>
+            <polyline points="175,125 175,110 190,110" fill="none" stroke="var(--primary)" stroke-width="1.8"/>
+            <!-- 頂点記号 -->
+            <text x="15" y="132" fill="var(--text)" font-size="16" font-weight="bold" font-family="Latin Modern Math Custom, serif">A</text>
+            <text x="198" y="132" fill="var(--text)" font-size="16" font-weight="bold" font-family="Latin Modern Math Custom, serif">C</text>
+            <text x="195" y="18" fill="var(--text)" font-size="16" font-weight="bold" font-family="Latin Modern Math Custom, serif">B</text>
+            <!-- ななめ・よこ・たて（授業スライドの完全対応カラー） -->
+            <text x="95" y="65" fill="#22c55e" font-size="16" font-weight="bold" text-anchor="middle">ななめ</text>
+            <text x="110" y="142" fill="#ef4444" font-size="16" font-weight="bold" text-anchor="middle">よこ</text>
+            <text x="202" y="75" fill="#eab308" font-size="16" font-weight="bold" text-anchor="start">たて</text>
+          </svg>
+
+          <div class="rule-formula-list">
+            <div class="rule-formula-row">
+              <span class="rule-label">sin A =</span>
+              <span class="rule-frac">
+                <span class="rule-frac-num c-tate">たて</span>
+                <span class="rule-frac-den c-naname">ななめ</span>
+              </span>
+            </div>
+            <div class="rule-formula-row">
+              <span class="rule-label">cos A =</span>
+              <span class="rule-frac">
+                <span class="rule-frac-num c-yoko">よこ</span>
+                <span class="rule-frac-den c-naname">ななめ</span>
+              </span>
+            </div>
+            <div class="rule-formula-row">
+              <span class="rule-label">tan A =</span>
+              <span class="rule-frac">
+                <span class="rule-frac-num c-tate">たて</span>
+                <span class="rule-frac-den c-yoko">よこ</span>
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 三平方の定理 -->
+        <div class="pythagoras-box">
+          <div style="font-size:0.95rem; color:var(--text-muted);">三平方の定理</div>
+          <div class="pythagoras-expr">
+            <span class="c-tate">たて</span><sup>2</sup> ＋ <span class="c-yoko">よこ</span><sup>2</sup> ＝ <span class="c-naname">ななめ</span><sup>2</sup>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section 2: 単位円 -->
+      <div class="hint-section">
+        <div class="hint-section-title">🧭 単位円での三角比の定義 (半径 r = 1)</div>
+        <p class="hint-desc">
+          角度をタップすると動径と各値が連動します。<br>
+          単位円上の点Pの <strong>x 座標が cos θ</strong>、<strong>y 座標が sin θ</strong>、<strong>直線の傾きが tan θ</strong> です。
+        </p>
+        <div class="unit-circle-controls" id="circleAngleChips"></div>
+        <div class="circle-display-wrap">
+          <svg id="unitCircleSvg" width="260" height="260" viewBox="-1.35 -1.35 2.7 2.7" style="background:var(--card-bg); border-radius:50%; border:1px solid var(--card-border);"></svg>
+          <div class="circle-info-card" id="circleInfoBox"></div>
+        </div>
+      </div>
+
+      <!-- Section 3: 三角定規の比 -->
+      <div class="hint-section">
+        <div class="hint-section-title">📐 三角定規の辺の比</div>
+        <div class="triangle-diagram-grid">
+          <!-- 30°-60°-90° -->
+          <div class="diagram-box">
+            <h4>30°–60°–90° ( 1 : 2 : √3 )</h4>
+            <svg width="220" height="135" viewBox="0 0 220 135">
+              <polygon points="25,115 181,115 181,25" fill="none" stroke="var(--primary)" stroke-width="2.5" stroke-linejoin="round"/>
+              <polyline points="166,115 166,100 181,100" fill="none" stroke="var(--primary)" stroke-width="1.8"/>
+              <text x="103" y="132" fill="var(--text)" font-size="16" font-weight="bold" font-family="Latin Modern Math Custom, serif" text-anchor="middle">√3</text>
+              <text x="195" y="74" fill="var(--text)" font-size="16" font-weight="bold" font-family="Latin Modern Math Custom, serif" text-anchor="start">1</text>
+              <text x="96" y="58" fill="var(--text)" font-size="16" font-weight="bold" font-family="Latin Modern Math Custom, serif" text-anchor="middle">2</text>
+              <text x="48" y="110" fill="var(--accent)" font-size="13" font-weight="bold">30°</text>
+              <text x="162" y="48" fill="var(--accent)" font-size="13" font-weight="bold">60°</text>
+            </svg>
+            <div class="trig-values-list">
+              <div class="trig-val-row">
+                <span class="trig-label">sin 30° =</span>
+                <span class="math-expr"><span class="frac"><span class="frac-num">1</span><span class="frac-den">2</span></span></span>
+              </div>
+              <div class="trig-val-row">
+                <span class="trig-label">cos 30° =</span>
+                <span class="math-expr"><span class="frac"><span class="frac-num"><span class="sqrt"><span class="sqrt-sym">√</span><span class="sqrt-rad">3</span></span></span><span class="frac-den">2</span></span></span>
+              </div>
+              <div class="trig-val-row">
+                <span class="trig-label">tan 30° =</span>
+                <span class="math-expr"><span class="frac"><span class="frac-num">1</span><span class="frac-den"><span class="sqrt"><span class="sqrt-sym">√</span><span class="sqrt-rad">3</span></span></span></span></span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 45°-45°-90° -->
+          <div class="diagram-box">
+            <h4>45°–45°–90° ( 1 : 1 : √2 )</h4>
+            <svg width="220" height="135" viewBox="0 0 220 135">
+              <polygon points="55,115 155,115 155,15" fill="none" stroke="var(--primary)" stroke-width="2.5" stroke-linejoin="round"/>
+              <polyline points="140,115 140,100 155,100" fill="none" stroke="var(--primary)" stroke-width="1.8"/>
+              <text x="105" y="132" fill="var(--text)" font-size="16" font-weight="bold" font-family="Latin Modern Math Custom, serif" text-anchor="middle">1</text>
+              <text x="169" y="68" fill="var(--text)" font-size="16" font-weight="bold" font-family="Latin Modern Math Custom, serif" text-anchor="start">1</text>
+              <text x="96" y="55" fill="var(--text)" font-size="16" font-weight="bold" font-family="Latin Modern Math Custom, serif" text-anchor="middle">√2</text>
+              <text x="76" y="110" fill="var(--accent)" font-size="13" font-weight="bold">45°</text>
+              <text x="136" y="44" fill="var(--accent)" font-size="13" font-weight="bold">45°</text>
+            </svg>
+            <div class="trig-values-list">
+              <div class="trig-val-row">
+                <span class="trig-label">sin 45° =</span>
+                <span class="math-expr"><span class="frac"><span class="frac-num">1</span><span class="frac-den"><span class="sqrt"><span class="sqrt-sym">√</span><span class="sqrt-rad">2</span></span></span></span></span>
+              </div>
+              <div class="trig-val-row">
+                <span class="trig-label">cos 45° =</span>
+                <span class="math-expr"><span class="frac"><span class="frac-num">1</span><span class="frac-den"><span class="sqrt"><span class="sqrt-sym">√</span><span class="sqrt-rad">2</span></span></span></span></span>
+              </div>
+              <div class="trig-val-row">
+                <span class="trig-label">tan 45° =</span>
+                <span class="math-expr">1</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    const ANSWERS = {
+      sin: {
+        0: "0", 30: "1/2", 45: "1/√2", 60: "√3/2", 90: "1",
+        120: "√3/2", 135: "1/√2", 150: "1/2", 180: "0"
+      },
+      cos: {
+        0: "1", 30: "√3/2", 45: "1/√2", 60: "1/2", 90: "0",
+        120: "-1/2", 135: "-1/√2", 150: "-√3/2", 180: "-1"
+      },
+      tan: {
+        0: "0", 30: "1/√3", 45: "1", 60: "√3", 90: "なし",
+        120: "-√3", 135: "-1", 150: "-1/√3", 180: "0"
+      }
+    };
+
+    const HTML_MATH = {
+      "0": '<span class="math-expr">0</span>',
+      "1": '<span class="math-expr">1</span>',
+      "-1": '<span class="math-expr">−1</span>',
+      "1/2": '<span class="math-expr"><span class="frac"><span class="frac-num">1</span><span class="frac-den">2</span></span></span>',
+      "-1/2": '<span class="math-expr">−<span class="frac"><span class="frac-num">1</span><span class="frac-den">2</span></span></span>',
+      "1/√2": '<span class="math-expr"><span class="frac"><span class="frac-num">1</span><span class="frac-den"><span class="sqrt"><span class="sqrt-sym">√</span><span class="sqrt-rad">2</span></span></span></span></span>',
+      "-1/√2": '<span class="math-expr">−<span class="frac"><span class="frac-num">1</span><span class="frac-den"><span class="sqrt"><span class="sqrt-sym">√</span><span class="sqrt-rad">2</span></span></span></span></span>',
+      "√3/2": '<span class="math-expr"><span class="frac"><span class="frac-num"><span class="sqrt"><span class="sqrt-sym">√</span><span class="sqrt-rad">3</span></span></span><span class="frac-den">2</span></span></span>',
+      "-√3/2": '<span class="math-expr">−<span class="frac"><span class="frac-num"><span class="sqrt"><span class="sqrt-sym">√</span><span class="sqrt-rad">3</span></span></span><span class="frac-den">2</span></span></span>',
+      "1/√3": '<span class="math-expr"><span class="frac"><span class="frac-num">1</span><span class="frac-den"><span class="sqrt"><span class="sqrt-sym">√</span><span class="sqrt-rad">3</span></span></span></span></span>',
+      "-1/√3": '<span class="math-expr">−<span class="frac"><span class="frac-num">1</span><span class="frac-den"><span class="sqrt"><span class="sqrt-sym">√</span><span class="sqrt-rad">3</span></span></span></span></span>',
+      "√3": '<span class="math-expr"><span class="sqrt"><span class="sqrt-sym">√</span><span class="sqrt-rad">3</span></span></span>',
+      "-√3": '<span class="math-expr">−<span class="sqrt"><span class="sqrt-sym">√</span><span class="sqrt-rad">3</span></span></span>',
+      "なし": '<span class="math-expr non-italic">なし</span>'
+    };
+
+    const PALETTE_VALUES = [
+      "1", "0", "-1", "なし",
+      "1/2", "-1/2", "√3/2", "-√3/2",
+      "1/√2", "-1/√2", "1/√3", "-1/√3",
+      "√3", "-√3"
+    ];
+
+    const ANGLES = [0, 30, 45, 60, 90, 120, 135, 150, 180];
+    const FUNCS = ["sin", "cos", "tan"];
+
+    let currentMode = "random";
+    let selectedCell = null;
+    let timerInterval = null;
+    let secondsElapsed = 0;
+    let mistakes = 0;
+    let solvedCount = 0;
+    let targetTotal = 0;
+
+    const trigTable = document.getElementById("trigTable");
+    const paletteGrid = document.getElementById("paletteGrid");
+    const activeTargetText = document.getElementById("activeTargetText");
+    const timeVal = document.getElementById("timeVal");
+    const progressVal = document.getElementById("progressVal");
+    const mistakeVal = document.getElementById("mistakeVal");
+    const resetBtn = document.getElementById("resetBtn");
+    const feedbackToast = document.getElementById("feedbackToast");
+    const hintBtn = document.getElementById("hintBtn");
+    const hintModal = document.getElementById("hintModal");
+    const modalCloseBtn = document.getElementById("modalCloseBtn");
+    const themeToggleBtn = document.getElementById("themeToggleBtn");
+
+    function initPalette() {
+      paletteGrid.innerHTML = "";
+      PALETTE_VALUES.forEach(val => {
+        const btn = document.createElement("button");
+        btn.className = "val-btn";
+        btn.dataset.val = val;
+        btn.innerHTML = HTML_MATH[val];
+        btn.addEventListener("click", () => handleInput(val));
+        paletteGrid.appendChild(btn);
+      });
+    }
+
+    function setCellContent(cell, val) {
+      if (!val) {
+        cell.innerHTML = "";
+      } else {
+        cell.innerHTML = HTML_MATH[val] || val;
+      }
+    }
+
+    function resetDrill() {
+      clearInterval(timerInterval);
+      secondsElapsed = 0;
+      mistakes = 0;
+      solvedCount = 0;
+      timeVal.textContent = "00:00";
+      mistakeVal.textContent = "0";
+      selectedCell = null;
+      activeTargetText.textContent = "マスを選択してください";
+
+      const cells = trigTable.querySelectorAll(".quiz-cell");
+      cells.forEach(c => {
+        c.className = "quiz-cell";
+        c.innerHTML = "";
+      });
+
+      if (currentMode === "view") {
+        document.getElementById("paletteCard").style.display = "none";
+        document.getElementById("statsWrap").style.display = "none";
+        FUNCS.forEach(func => {
+          ANGLES.forEach(angle => {
+            const cell = trigTable.querySelector(`tr[data-func="${func}"] td[data-angle="${angle}"]`);
+            setCellContent(cell, ANSWERS[func][angle]);
+          });
+        });
+        return;
+      }
+
+      document.getElementById("paletteCard").style.display = "flex";
+      document.getElementById("statsWrap").style.display = "flex";
+
+      let cellsToHide = [];
+
+      if (currentMode === "full") {
+        cells.forEach(c => cellsToHide.push(c));
+      } else if (currentMode === "random") {
+        const allCells = Array.from(cells);
+        for (let i = allCells.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [allCells[i], allCells[j]] = [allCells[j], allCells[i]];
+        }
+        cellsToHide = allCells.slice(0, 14);
+
+        allCells.slice(14).forEach(c => {
+          const func = c.parentElement.dataset.func;
+          const angle = c.dataset.angle;
+          setCellContent(c, ANSWERS[func][angle]);
+        });
+      }
+
+      targetTotal = cellsToHide.length;
+      progressVal.textContent = `0 / ${targetTotal}`;
+
+      cellsToHide.forEach(c => {
+        c.classList.add("hidden");
+        setCellContent(c, "");
+      });
+
+      if (cellsToHide.length > 0) {
+        selectCell(cellsToHide[0]);
+      }
+
+      timerInterval = setInterval(() => {
+        secondsElapsed++;
+        const mins = String(Math.floor(secondsElapsed / 60)).padStart(2, "0");
+        const secs = String(secondsElapsed % 60).padStart(2, "0");
+        timeVal.textContent = `${mins}:${secs}`;
+      }, 1000);
+    }
+
+    function selectCell(cell) {
+      if (!cell || !cell.classList.contains("hidden")) return;
+      if (selectedCell) {
+        selectedCell.classList.remove("selected");
+      }
+      selectedCell = cell;
+      selectedCell.classList.add("selected");
+
+      const func = cell.parentElement.dataset.func;
+      const angle = cell.dataset.angle;
+      activeTargetText.textContent = `${func} ${angle}° を入力中`;
+    }
+
+    function handleInput(val) {
+      if (!selectedCell || currentMode === "view") return;
+
+      const func = selectedCell.parentElement.dataset.func;
+      const angle = selectedCell.dataset.angle;
+      const correctVal = ANSWERS[func][angle];
+
+      if (val === correctVal) {
+        const cell = selectedCell;
+        cell.classList.remove("hidden", "selected", "wrong-anim");
+        cell.classList.add("correct-anim");
+        setCellContent(cell, val);
+
+        solvedCount++;
+        progressVal.textContent = `${solvedCount} / ${targetTotal}`;
+        showToast("正解！", true);
+
+        const nextCell = trigTable.querySelector(".quiz-cell.hidden");
+        if (nextCell) {
+          selectCell(nextCell);
+        } else {
+          clearInterval(timerInterval);
+          selectedCell = null;
+          activeTargetText.textContent = "🎉 全問クリア！";
+          confetti({ particleCount: 120, spread: 70, origin: { y: 0.6 } });
+        }
+      } else {
+        mistakes++;
+        mistakeVal.textContent = mistakes;
+        selectedCell.classList.add("wrong-anim");
+        setTimeout(() => {
+          if (selectedCell) selectedCell.classList.remove("wrong-anim");
+        }, 400);
+        showToast("残念！", false);
+      }
+    }
+
+    let toastTimeout = null;
+    function showToast(msg, isSuccess) {
+      clearTimeout(toastTimeout);
+      feedbackToast.textContent = msg;
+      feedbackToast.className = `feedback-toast show ${isSuccess ? 'correct' : 'wrong'}`;
+      toastTimeout = setTimeout(() => {
+        feedbackToast.classList.remove("show");
+      }, 1000);
+    }
+
+    trigTable.addEventListener("click", (e) => {
+      const cell = e.target.closest(".quiz-cell");
+      if (cell && cell.classList.contains("hidden")) {
+        selectCell(cell);
+      }
+    });
+
+    document.querySelectorAll(".tab-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+        currentMode = btn.dataset.mode;
+        resetDrill();
+      });
+    });
+
+    resetBtn.addEventListener("click", resetDrill);
+
+    document.querySelectorAll(".size-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        document.querySelectorAll(".size-btn").forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+        const size = btn.dataset.size;
+        document.body.setAttribute("data-font-size", size);
+      });
+    });
+
+    themeToggleBtn.addEventListener("click", () => {
+      const isDark = document.body.getAttribute("data-theme") === "dark";
+      const nextTheme = isDark ? "light" : "dark";
+      document.body.setAttribute("data-theme", nextTheme);
+      themeToggleBtn.innerHTML = nextTheme === "dark" ? "☀️ ライト" : "🌙 ダーク";
+      drawUnitCircle(currentAngleDiagram);
+    });
+
+    let currentAngleDiagram = 30;
+
+    hintBtn.addEventListener("click", () => {
+      hintModal.classList.add("active");
+      drawUnitCircle(currentAngleDiagram);
+    });
+
+    modalCloseBtn.addEventListener("click", () => {
+      hintModal.classList.remove("active");
+    });
+
+    hintModal.addEventListener("click", (e) => {
+      if (e.target === hintModal) hintModal.classList.remove("active");
+    });
+
+    const chipContainer = document.getElementById("circleAngleChips");
+    ANGLES.forEach(deg => {
+      const chip = document.createElement("button");
+      chip.className = `angle-chip ${deg === 30 ? 'active' : ''}`;
+      chip.textContent = `${deg}°`;
+      chip.addEventListener("click", () => {
+        document.querySelectorAll(".angle-chip").forEach(c => c.classList.remove("active"));
+        chip.classList.add("active");
+        currentAngleDiagram = deg;
+        drawUnitCircle(deg);
+      });
+      chipContainer.appendChild(chip);
+    });
+
+    function drawUnitCircle(deg) {
+      const svg = document.getElementById("unitCircleSvg");
+      const rad = (deg * Math.PI) / 180;
+      const x = Math.cos(rad);
+      const y = -Math.sin(rad);
+
+      const isDark = document.body.getAttribute("data-theme") === "dark";
+      const axisColor = isDark ? "#475569" : "#cbd5e1";
+      const textColor = isDark ? "#94a3b8" : "#64748b";
+      const primaryColor = isDark ? "#38bdf8" : "#0284c7";
+
+      svg.innerHTML = `
+        <line x1="-1.25" y1="0" x2="1.25" y2="0" stroke="${axisColor}" stroke-width="0.04"/>
+        <line x1="0" y1="-1.25" x2="0" y2="1.25" stroke="${axisColor}" stroke-width="0.04"/>
+        <text x="1.15" y="-0.08" fill="${textColor}" font-size="0.16" font-family="Latin Modern Math Custom, serif" text-anchor="middle">x</text>
+        <text x="0.1" y="-1.12" fill="${textColor}" font-size="0.16" font-family="Latin Modern Math Custom, serif">y</text>
+        <circle cx="0" cy="0" r="1" fill="none" stroke="${axisColor}" stroke-dasharray="0.06 0.04" stroke-width="0.03"/>
+        <line x1="0" y1="0" x2="${x}" y2="0" stroke="#f59e0b" stroke-width="0.06"/>
+        <line x1="${x}" y1="0" x2="${x}" y2="${y}" stroke="#10b981" stroke-width="0.06"/>
+        <line x1="0" y1="0" x2="${x}" y2="${y}" stroke="${primaryColor}" stroke-width="0.06"/>
+        <circle cx="${x}" cy="${y}" r="0.08" fill="${primaryColor}"/>
+        <text x="${x + (x>=0 ? 0.12 : -0.25)}" y="${y + (y<=0 ? -0.1 : 0.18)}" fill="var(--text)" font-size="0.18" font-family="Latin Modern Math Custom, serif" font-weight="bold">P</text>
+      `;
+
+      const sinVal = ANSWERS.sin[deg];
+      const cosVal = ANSWERS.cos[deg];
+      const tanVal = ANSWERS.tan[deg];
+
+      const infoBox = document.getElementById("circleInfoBox");
+      infoBox.innerHTML = `
+        <div style="font-weight:bold; font-size:1.25rem; margin-bottom:8px; color:var(--primary); font-family:'Latin Modern Math Custom', serif;">θ = ${deg}°</div>
+        <div style="display:flex; align-items:center; justify-content:space-between; gap:10px;">
+          <span>x 座標 (cos):</span>
+          <span>${HTML_MATH[cosVal]}</span>
+        </div>
+        <div style="display:flex; align-items:center; justify-content:space-between; gap:10px;">
+          <span>y 座標 (sin):</span>
+          <span>${HTML_MATH[sinVal]}</span>
+        </div>
+        <div style="display:flex; align-items:center; justify-content:space-between; gap:10px;">
+          <span>傾き (tan):</span>
+          <span>${HTML_MATH[tanVal]}</span>
+        </div>
+      `;
+    }
+
+    window.addEventListener("DOMContentLoaded", () => {
+      initPalette();
+      resetDrill();
+    });
+  </script>
+</body>
+</html>
